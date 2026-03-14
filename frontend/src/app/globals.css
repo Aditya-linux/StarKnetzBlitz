@@ -1,0 +1,194 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #F5F0EB;
+  --color-fg: #1a1a2e;
+  --color-accent: #6C5CE7;
+  --color-accent-light: #A29BFE;
+  --color-card: #FFFFFF;
+  --color-card-border: #1a1a2e;
+  --color-success: #00B894;
+  --color-warning: #FDCB6E;
+  --color-danger: #E17055;
+  --color-muted: #636E72;
+}
+
+/* Force light mode — override Tailwind v4 dark mode auto-detection */
+html {
+  color-scheme: light !important;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #F5F0EB !important;
+  color: #1a1a2e !important;
+  font-family: 'Space Grotesk', sans-serif !important;
+  min-height: 100vh;
+  margin: 0;
+}
+
+/* Soft Neo-Brutalist Card */
+.neo-card {
+  background: #FFFFFF;
+  border: 2.5px solid #1a1a2e;
+  border-radius: 16px;
+  box-shadow: 4px 4px 0px #1a1a2e;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.neo-card:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px #1a1a2e;
+}
+
+/* Neo-Brutalist Button */
+.neo-btn {
+  border: 2.5px solid #1a1a2e;
+  border-radius: 12px;
+  box-shadow: 3px 3px 0px #1a1a2e;
+  font-weight: 600;
+  font-family: 'Space Grotesk', sans-serif;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  color: #1a1a2e;
+}
+
+.neo-btn:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0px #1a1a2e;
+}
+
+.neo-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px #1a1a2e;
+}
+
+.neo-btn-accent {
+  background: #6C5CE7;
+  color: #FFFFFF !important;
+  border: 2.5px solid #1a1a2e;
+  border-radius: 12px;
+  box-shadow: 3px 3px 0px #1a1a2e;
+  font-weight: 600;
+  font-family: 'Space Grotesk', sans-serif;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.neo-btn-accent:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0px #1a1a2e;
+  background: #7C6CF7;
+}
+
+.neo-btn-accent:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px #1a1a2e;
+}
+
+/* Neo-Brutalist Badge */
+.neo-badge {
+  border: 2px solid #1a1a2e;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.75rem;
+  padding: 4px 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #1a1a2e;
+  background: #DFE6E9;
+}
+
+/* Accent gradient text */
+.accent-text {
+  background: linear-gradient(135deg, #6C5CE7 0%, #E17055 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Range slider styling */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 8px;
+  background: #DFE6E9;
+  border-radius: 4px;
+  border: 2px solid #1a1a2e;
+  outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  background: #6C5CE7;
+  border: 2.5px solid #1a1a2e;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 2px 2px 0px #1a1a2e;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F5F0EB;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #636E72;
+  border-radius: 4px;
+}
+
+/* Markdown prose overrides for neo-brutalist */
+.prose-neo h1, .prose-neo h2, .prose-neo h3 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  color: #1a1a2e;
+}
+
+.prose-neo p {
+  color: #2D3436;
+  line-height: 1.7;
+}
+
+.prose-neo code {
+  font-family: 'JetBrains Mono', monospace;
+  background: #DFE6E9;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.85em;
+  border: 1.5px solid #1a1a2e;
+  color: #1a1a2e;
+}
+
+.prose-neo ul, .prose-neo ol {
+  color: #2D3436;
+}
+
+.prose-neo li {
+  color: #2D3436;
+}
+
+.prose-neo a {
+  color: #6C5CE7;
+  text-decoration: underline;
+  text-decoration-style: wavy;
+  text-underline-offset: 3px;
+}
+
+/* Decorative shape base */
+.deco-shape {
+  position: absolute;
+  border: 2.5px solid #1a1a2e;
+  pointer-events: none;
+}

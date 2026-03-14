@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+.next/
+out/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+venv/
+.venv/
+
+# Environment variables (IMPORTANT: contains API keys)
+.env
+.env.local
+.env.production
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build
+target/
+dist/
+
+# Gemini agent artifacts
+.gemini/
