@@ -4,6 +4,8 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Send, Coins } from "lucide-react";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
 export default function QuestionModal({ isOpen, onClose, userAddress, onSuccess }: any) {
   const [content, setContent] = useState("");
   const [bounty, setBounty] = useState(5);
@@ -17,7 +19,7 @@ export default function QuestionModal({ isOpen, onClose, userAddress, onSuccess 
     try {
       await new Promise(res => setTimeout(res, 2000));
 
-      const res = await fetch("http://localhost:8000/api/ask", {
+      const res = await fetch(`${API_URL}/api/ask`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

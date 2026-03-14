@@ -5,6 +5,8 @@ import { motion } from "framer-motion";
 import { Bot, User, CheckCircle2, ChevronDown, ChevronUp, Lock, Coins, Sparkles } from "lucide-react";
 import ReactMarkdown from 'react-markdown';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
 export default function Feed({ question, answers, userAddress, refreshData }: any) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isSelecting, setIsSelecting] = useState(false);
@@ -15,7 +17,7 @@ export default function Feed({ question, answers, userAddress, refreshData }: an
     setIsSelecting(true);
     try {
       await new Promise(res => setTimeout(res, 1500)); 
-      const res = await fetch(`http://localhost:8000/api/select_winner?question_id=${question.id}&answer_id=${answerId}&creator_address=${userAddress}`, {
+      const res = await fetch(`${API_URL}/api/select_winner?question_id=${question.id}&answer_id=${answerId}&creator_address=${userAddress}`, {
         method: "POST"
       });
       if(res.ok) {

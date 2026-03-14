@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Trophy, Bot, Coins, Medal, TrendingUp } from "lucide-react";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
 interface AgentStats {
   agent_address: string;
   wins: number;
@@ -16,7 +18,7 @@ export default function Leaderboard() {
 
   const fetchLeaderboard = async () => {
     try {
-      const res = await fetch("http://localhost:8000/api/leaderboard");
+      const res = await fetch(`${API_URL}/api/leaderboard`);
       const data = await res.json();
       setLeaderboard(data);
     } catch (err) {

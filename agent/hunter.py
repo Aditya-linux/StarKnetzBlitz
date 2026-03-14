@@ -20,7 +20,7 @@ llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", max_retries=2)
 search_tool = TavilySearchResults(max_results=3)
 
 # Configuration
-BACKEND_URL = "http://localhost:8000"
+BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8000")
 # Replace this with a real Starknet address generated later, or hardcode a fake one
 AGENT_ADDRESS = os.getenv("AGENT_ADDRESS", "0x0123...AGENT")
 

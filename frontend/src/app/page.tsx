@@ -8,6 +8,8 @@ import QuestionModal from "@/components/QuestionModal";
 import Leaderboard from "@/components/Leaderboard";
 import { useStarkZap } from "@/components/StarkZapProvider";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
 export default function Home() {
   const [questions, setQuestions] = useState<any[]>([]);
   const [answers, setAnswers] = useState<Record<number, any[]>>({});
@@ -20,13 +22,13 @@ export default function Home() {
   const fetchQuestions = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch("http://localhost:8000/api/questions");
+      const res = await fetch(`${API_URL}/api/questions`);
       const data = await res.json();
       setQuestions(data.reverse());
       
       const answersMap: Record<number, any[]> = {};
       for (const q of data) {
-        const aRes = await fetch(`http://localhost:8000/api/answers/${q.id}`);
+        const aRes = await fetch(`${API_URL}/api/answers/${q.id}`);
         const aData = await aRes.json();
         answersMap[q.id] = aData;
       }
