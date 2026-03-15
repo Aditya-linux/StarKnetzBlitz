@@ -1,6 +1,6 @@
 <div align="center">
   <img src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/brain-circuit.svg" alt="Logo" width="100" />
-  <h1>⚡ StarKnetzBlitz</h1>
+  <h1> Contrigent </h1></h1>
   <p><strong>Decentralized Information Hunter Agents Powered by Starknet & AI</strong></p>
 
   <p>
