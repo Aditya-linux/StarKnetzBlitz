@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from typing import List, Optional
 from datetime import datetime
 import time
+import os
 
 app = FastAPI(title="Information Hunter Agents Backend")
 
@@ -15,6 +16,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# ===========================================
+# REWARD DISTRIBUTION CONFIG
+# ===========================================
+OWNER_ADDRESS = os.getenv("OWNER_ADDRESS", "0x022f5A1244c8FFC30f00260bCC6ed0D6eD8343DA4065592970A7D2BE4e811F60")
+AGENT_REWARD = float(os.getenv("AGENT_REWARD", "0.05"))  # STRK per agent who submitted an answer
 
 # In-memory mock Database for MVP
 db = {
@@ -30,6 +37,7 @@ class QuestionSub(BaseModel):
 class AnswerSub(BaseModel):
     question_id: int
     agent_address: str
+    agent_name: str # Added name
     content: str
 
 @app.get("/")
@@ -57,6 +65,7 @@ def submit_answer(a: AnswerSub):
         "id": new_id,
         "question_id": a.question_id,
         "agent_address": a.agent_address,
+        "agent_name": a.agent_name,
         "content": a.content,
         "created_at": datetime.now().isoformat(),
         "is_winner": False
@@ -92,13 +101,46 @@ def select_winner(question_id: int, answer_id: int, creator_address: str):
     if not answer:
         return {"status": "error", "message": "Answer not found"}
 
+    # ---- REWARD DISTRIBUTION (only the selected agent) ----
+    bounty = question["bounty"]
+    agent_payout = AGENT_REWARD  # 0.05 STRK to the winning agent
+    owner_payout = max(bounty - agent_payout, 0)
+    
+    # Build payout breakdown (only winner + owner)
+    payouts = [
+        {
+            "agent_address": answer["agent_address"],
+            "agent_name": answer.get("agent_name", "Agent"),
+            "amount": agent_payout
+        },
+        {
+            "agent_address": OWNER_ADDRESS,
+            "agent_name": "Platform Owner",
+            "amount": owner_payout
+        }
+    ]
+    
     # Mark question as RESOLVED
     question["status"] = "RESOLVED"
+    question["payouts"] = payouts
     
     # Mark answer as winner
     answer["is_winner"] = True
 
-    return {"status": "success", "message": "Winner selected"}
+    return {
+        "status": "success", 
+        "message": "Winner selected & reward sent",
+        "breakdown": {
+            "total_bounty": bounty,
+            "winner_agent": answer.get("agent_name", "Agent"),
+            "agent_reward": agent_payout,
+            "owner_payout": owner_payout,
+            "owner_address": OWNER_ADDRESS,
+            "payouts": payouts
+        }
+    }
+
+
 
 @app.get("/api/leaderboard")
 def get_leaderboard():

@@ -3,7 +3,7 @@ import requests
 import os
 from dotenv import load_dotenv
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_community.tools.tavily_search import TavilySearchResults
+from langchain_tavily import TavilySearch
 
 # Load environment variables (TAVILY_API_KEY, OPENAI_API_KEY)
 load_dotenv()
@@ -16,8 +16,12 @@ if not os.getenv("TAVILY_API_KEY"):
     print("WARNING: TAVILY_API_KEY is not set.")
 
 # Initialize the LLM and Search Tool
-llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", max_retries=2)
-search_tool = TavilySearchResults(max_results=3)
+llm = ChatGoogleGenerativeAI(
+    model="gemini-2.5-flash", 
+    google_api_key=os.getenv("GOOGLE_API_KEY"),
+    max_retries=2
+)
+search_tool = TavilySearch(max_results=3)
 
 # Configuration
 BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8000")
@@ -47,6 +51,7 @@ def process_question(question_id, content):
         response = requests.post(f"{BACKEND_URL}/api/submit", json={
             "question_id": question_id,
             "agent_address": AGENT_ADDRESS,
+            "agent_name": "Information Hunter",
             "content": answer
         })
         

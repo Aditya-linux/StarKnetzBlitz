@@ -1,24 +1,25 @@
 "use client";
 
 import { createContext, useContext, useState, useCallback, ReactNode, useRef } from "react";
-import { StarkSDK } from "starkzap";
-import starknetCore from "get-starknet-core";
 
 /**
- * StarkZap SDK Integration Provider
- * 
- * Supports both Cartridge Controller (Passkeys/Socials) and Standard Wallet Extensions (Braavos/Argent X)
+ * Wallet Provider — Direct window.starknet integration
+ * Works with Argent X & Braavos without any SDK abstraction issues
  */
+
+const STRK_ADDRESS = "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d";
 
 interface StarkZapContextType {
   isConnected: boolean;
   address: string;
   balance: number;
-  login: () => Promise<void>; // Backward compatible, aliases to Cartridge
+  login: () => Promise<void>;
   loginWithExtension: () => Promise<void>;
   logout: () => void;
   isLoading: boolean;
   walletType: "cartridge" | "extension" | "mock" | null;
+  transferSTRK: (toAddress: string, amount: number) => Promise<string | null>;
+  refreshBalance: () => Promise<void>;
 }
 
 const StarkZapContext = createContext<StarkZapContextType>({
@@ -30,9 +31,19 @@ const StarkZapContext = createContext<StarkZapContextType>({
   logout: () => {},
   isLoading: false,
   walletType: null,
+  transferSTRK: async () => null,
+  refreshBalance: async () => {},
 });
 
 export const useStarkZap = () => useContext(StarkZapContext);
+
+// Helper to get available starknet wallet from window
+function getStarknetWallet(): any {
+  if (typeof window === "undefined") return null;
+  const win = window as any;
+  // Try Argent X first, then Braavos, then generic
+  return win.starknet_argentX || win.starknet_braavos || win.starknet || null;
+}
 
 export default function StarkZapProvider({ children }: { children: ReactNode }) {
   const [isConnected, setIsConnected] = useState(false);
@@ -41,100 +52,126 @@ export default function StarkZapProvider({ children }: { children: ReactNode }) 
   const [isLoading, setIsLoading] = useState(false);
   const [walletType, setWalletType] = useState<"cartridge" | "extension" | "mock" | null>(null);
   
-  const sdkRef = useRef<StarkSDK | null>(null);
   const walletRef = useRef<any>(null);
 
-  // Fetch STRK balance via our own API route (no CORS issues!)
-  const fetchBalance = async (userAddress: string) => {
+  // Fetch STRK balance via our API route
+  const fetchBalance = useCallback(async (userAddress?: string) => {
+    const addr = userAddress || address;
+    if (!addr) return;
     try {
-      const res = await fetch(`/api/balance?address=${encodeURIComponent(userAddress)}`);
+      const res = await fetch(`/api/balance?address=${encodeURIComponent(addr)}`);
       const data = await res.json();
       if (data.balance) {
         setBalance(Number(data.balance));
       }
     } catch (e) {
-      console.warn("[StarkZap] Non-critical: Could not fetch balance", e);
+      console.warn("[Wallet] Could not fetch balance", e);
       setBalance(0);
     }
-  };
+  }, [address]);
 
-  const loginWithCartridge = useCallback(async () => {
+  // Connect wallet via window.starknet (Argent X / Braavos)
+  const loginWithExtension = useCallback(async () => {
     setIsLoading(true);
     try {
-      if (!sdkRef.current) {
-        sdkRef.current = new StarkSDK({ network: "sepolia" });
-      }
-
-      // Use Cartridge Controller — opens a popup for social login / passkeys
-      const wallet = await sdkRef.current.connectCartridge();
-      walletRef.current = wallet;
-
-      // Get the wallet address
-      const addressVal = (wallet as any).address;
-      const walletAddress = typeof addressVal === "function"
-        ? await addressVal()
-        : addressVal || "0xCartridgeUser";
-
-      const addrStr = String(walletAddress);
-      setAddress(addrStr);
-      setIsConnected(true);
-      setWalletType("cartridge");
-      console.log("[StarkZap] Connected via Cartridge with address:", addrStr);
-
-      await fetchBalance(addrStr);
-
-    } catch (err: any) {
-      const errorMessage = err?.message || "";
+      const starknetWallet = getStarknetWallet();
       
-      if (errorMessage.includes("closed") || errorMessage.includes("cancel")) {
-        console.log("[StarkZap] User cancelled Cartridge login");
+      if (!starknetWallet) {
+        alert("No Starknet wallet found!\n\nPlease install Argent X or Braavos browser extension.");
         setIsLoading(false);
         return;
       }
 
-      if (errorMessage.includes("initialize")) {
-        console.warn("[StarkZap] Cartridge Controller timed out or failed to initialize.");
-      } else {
-        console.error("[StarkZap] Cartridge login error:", err);
+      console.log("[Wallet] Found wallet:", starknetWallet.id || starknetWallet.name || "unknown");
+
+      // Enable the wallet — this triggers the popup
+      await starknetWallet.enable();
+      
+      console.log("[Wallet] Enabled. isConnected:", starknetWallet.isConnected);
+      console.log("[Wallet] selectedAddress:", starknetWallet.selectedAddress);
+      console.log("[Wallet] account:", starknetWallet.account);
+      console.log("[Wallet] account keys:", starknetWallet.account ? Object.keys(starknetWallet.account) : "none");
+
+      const walletAddress = starknetWallet.selectedAddress || starknetWallet.account?.address || "";
+      
+      if (!walletAddress) {
+        alert("Could not get wallet address. Please unlock your wallet on the Sepolia network.");
+        setIsLoading(false);
+        return;
       }
 
-      /* Mock Fallback (Disabled)
-      console.warn("[StarkZap] Falling back to mock wallet");
-      await new Promise((res) => setTimeout(res, 800));
-      const mockAddr = "0x0492BcF8A5B3E689C819F95fA612dDfFd8Aa99F2";
-      setAddress(mockAddr);
-      setIsConnected(true);
-      setWalletType("mock");
-      */
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  const loginWithExtension = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      // User explicitly requested to only connect this specific ready wallet address
-      const MY_READY_WALLET = "0x022f5A1244c8FFC30f00260bCC6ed0D6eD8343DA4065592970A7D2BE4e811F60";
-      
-      setAddress(MY_READY_WALLET);
+      walletRef.current = starknetWallet;
+      setAddress(walletAddress);
       setIsConnected(true);
       setWalletType("extension");
-      console.log(`[StarkZap] Connected via specific ready wallet account:`, MY_READY_WALLET);
+      console.log("[Wallet] Connected:", walletAddress);
 
-      // Fetch balance via our server-side API route (no CORS!)
-      await fetchBalance(MY_READY_WALLET);
+      await fetchBalance(walletAddress);
 
     } catch (err: any) {
-      console.error("[StarkZap] Ready wallet login error:", err);
-      alert(`Wallet Connection Error: ${err.message}`);
+      console.error("[Wallet] Connection error:", err);
+      alert(`Wallet Connection Error: ${err.message || "Unknown error"}`);
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [fetchBalance]);
+
+  const loginWithCartridge = useCallback(async () => {
+    await loginWithExtension();
+  }, [loginWithExtension]);
+
+  // Transfer STRK tokens — uses the wallet's account.execute()
+  const transferSTRK = useCallback(async (toAddress: string, amount: number): Promise<string | null> => {
+    const wallet = walletRef.current;
+    if (!wallet || !wallet.account) {
+      alert("Wallet not connected! Please connect your wallet first.");
+      return null;
+    }
+
+    try {
+      // Convert to uint256 as decimal strings (low, high)
+      const amountWei = BigInt(Math.floor(amount * 1e18));
+      const low = (amountWei & BigInt("0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")).toString(10);
+      const high = (amountWei >> BigInt(128)).toString(10);
+
+      console.log(`[Wallet] Transferring ${amount} STRK to ${toAddress}`);
+      console.log(`[Wallet] Amount uint256: low=${low}, high=${high}`);
+
+      let txHash: string | null = null;
+
+      if (typeof wallet.account.execute === "function") {
+        console.log("[Wallet] Using account.execute()");
+        // execute() expects an ARRAY of calls, each with calldata as string array
+        const result = await wallet.account.execute([
+          {
+            contractAddress: STRK_ADDRESS,
+            entrypoint: "transfer",
+            calldata: [toAddress, low, high]
+          }
+        ]);
+        txHash = result.transaction_hash;
+      } else {
+        console.error("[Wallet] No execute method found. Account keys:", 
+          Object.getOwnPropertyNames(Object.getPrototypeOf(wallet.account))
+        );
+        throw new Error("Wallet does not support execute(). Please update your wallet.");
+      }
+
+      console.log("[Wallet] Tx submitted:", txHash);
+      setTimeout(() => fetchBalance(), 5000);
+      return txHash;
+
+    } catch (err: any) {
+      if (err.message?.includes("abort") || err.message?.includes("reject") || err.message?.includes("cancel") || err.message?.includes("denied")) {
+        console.log("[Wallet] User rejected transaction");
+        return null;
+      }
+      console.error("[Wallet] Transfer error:", err);
+      throw err;
+    }
+  }, [fetchBalance]);
 
   const logout = useCallback(() => {
-    sdkRef.current = null;
     walletRef.current = null;
     setIsConnected(false);
     setAddress("");
@@ -145,14 +182,12 @@ export default function StarkZapProvider({ children }: { children: ReactNode }) 
   return (
     <StarkZapContext.Provider
       value={{ 
-        isConnected, 
-        address, 
-        balance, 
-        login: loginWithCartridge, // Maintain backwards compatibility
+        isConnected, address, balance, 
+        login: loginWithCartridge,
         loginWithExtension,
-        logout, 
-        isLoading,
-        walletType
+        logout, isLoading, walletType,
+        transferSTRK,
+        refreshBalance: fetchBalance
       }}
     >
       {children}

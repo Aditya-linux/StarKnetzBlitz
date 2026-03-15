@@ -2,42 +2,71 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Send, Coins } from "lucide-react";
+import { X, Send, Coins, Wallet, AlertTriangle } from "lucide-react";
+import { useStarkZap } from "./StarkZapProvider";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const OWNER_ADDRESS = "0x022f5A1244c8FFC30f00260bCC6ed0D6eD8343DA4065592970A7D2BE4e811F60";
 
 export default function QuestionModal({ isOpen, onClose, userAddress, onSuccess }: any) {
   const [content, setContent] = useState("");
   const [bounty, setBounty] = useState(5);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [txStatus, setTxStatus] = useState("");
+
+  const { transferSTRK, refreshBalance, balance } = useStarkZap();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!content.trim()) return;
+    if (balance < bounty) {
+      alert(`Insufficient balance! You have ${balance} STRK but need ${bounty} STRK.`);
+      return;
+    }
 
     setIsSubmitting(true);
     try {
-      await new Promise(res => setTimeout(res, 2000));
+      // Step 1: Transfer STRK to owner via real wallet signing
+      setTxStatus("⏳ Opening wallet for signing...");
+      const txHash = await transferSTRK(OWNER_ADDRESS, bounty);
+      
+      if (!txHash) {
+        setTxStatus("❌ Transaction cancelled");
+        setIsSubmitting(false);
+        return;
+      }
 
+      setTxStatus(`✅ Tx signed! Hash: ${txHash.substring(0, 10)}...`);
+
+      // Step 2: Register the bounty in backend
+      setTxStatus("📡 Registering bounty on backend...");
       const res = await fetch(`${API_URL}/api/ask`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           creator: userAddress,
           content,
-          bounty
+          bounty,
+          tx_hash: txHash
         })
       });
 
-      if(res.ok) {
+      if (res.ok) {
+        setTxStatus("🎉 Bounty posted!");
+        await refreshBalance();
         setContent("");
         setBounty(5);
-        onSuccess();
+        setTimeout(() => {
+          setTxStatus("");
+          onSuccess();
+        }, 1000);
       } else {
-        alert("Failed to post question.");
+        setTxStatus("❌ Backend error");
+        alert("Failed to register bounty on backend.");
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
+      setTxStatus(`❌ Error: ${err.message || "Transaction failed"}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -116,24 +145,53 @@ export default function QuestionModal({ isOpen, onClose, userAddress, onSuccess 
               </div>
             </div>
 
+            {/* Balance Warning */}
+            {balance < bounty && (
+              <div style={{ 
+                padding: "0.75rem", borderRadius: "0.5rem", 
+                background: "#FFEAA7", border: "2px solid #E2BC3F",
+                display: "flex", alignItems: "center", gap: "0.5rem",
+                fontSize: "0.8rem", fontWeight: 600, color: "#1a1a2e"
+              }}>
+                <AlertTriangle size={16} />
+                Insufficient balance ({balance} STRK). You need {bounty} STRK.
+              </div>
+            )}
+
+            {/* Transaction Status */}
+            {txStatus && (
+              <div style={{ 
+                padding: "0.75rem", borderRadius: "0.5rem", 
+                background: txStatus.includes("❌") ? "#FAB1A0" : "#55EFC4",
+                border: "2px solid #1a1a2e",
+                fontSize: "0.8rem", fontWeight: 600, color: "#1a1a2e",
+                textAlign: "center"
+              }}>
+                {txStatus}
+              </div>
+            )}
+
             <div style={{ paddingTop: "1rem", borderTop: "2.5px dashed #DFE6E9" }}>
               <button 
                 type="submit"
-                disabled={isSubmitting || !content.trim()}
+                disabled={isSubmitting || !content.trim() || balance < bounty}
                 className="neo-btn-accent"
                 style={{ 
                   width: "100%", display: "flex", alignItems: "center", justifyContent: "center",
                   gap: "0.5rem", padding: "1rem", fontSize: "1rem",
-                  opacity: (isSubmitting || !content.trim()) ? 0.5 : 1,
-                  cursor: (isSubmitting || !content.trim()) ? "not-allowed" : "pointer"
+                  opacity: (isSubmitting || !content.trim() || balance < bounty) ? 0.5 : 1,
+                  cursor: (isSubmitting || !content.trim() || balance < bounty) ? "not-allowed" : "pointer"
                 }}
               >
                 {isSubmitting ? (
-                  <div style={{ width: "1.25rem", height: "1.25rem", border: "2px solid rgba(255,255,255,0.3)", borderTop: "2px solid white", borderRadius: "50%" }} className="animate-spin" />
+                  <>
+                    <div style={{ width: "1.25rem", height: "1.25rem", border: "2px solid rgba(255,255,255,0.3)", borderTop: "2px solid white", borderRadius: "50%" }} className="animate-spin" />
+                    {txStatus.includes("wallet") ? "Waiting for Wallet..." : "Processing..."}
+                  </>
                 ) : (
                   <>
-                    <Send size={18} />
-                    Post Bounty via Starkzap
+                    <Wallet size={18} />
+                    Sign & Post Bounty ({bounty} STRK)
                   </>
                 )}
               </button>
