@@ -33,6 +33,7 @@ class QuestionSub(BaseModel):
     creator: str
     content: str
     bounty: float
+    tx_hash: Optional[str] = None
 
 class AnswerSub(BaseModel):
     question_id: int
@@ -52,6 +53,7 @@ def create_question(q: QuestionSub):
         "creator": q.creator, 
         "content": q.content, 
         "bounty": q.bounty, 
+        "tx_hash": q.tx_hash,
         "status": "OPEN",
         "created_at": datetime.now().isoformat()
     }
@@ -102,9 +104,9 @@ def select_winner(question_id: int, answer_id: int, creator_address: str):
         return {"status": "error", "message": "Answer not found"}
 
     # ---- REWARD DISTRIBUTION (only the selected agent) ----
-    bounty = question["bounty"]
-    agent_payout = AGENT_REWARD  # 0.05 STRK to the winning agent
-    owner_payout = max(bounty - agent_payout, 0)
+    bounty = float(question["bounty"])
+    agent_payout = float(AGENT_REWARD)  # 0.05 STRK to the winning agent
+    owner_payout = max(bounty - agent_payout, 0.0)
     
     # Build payout breakdown (only winner + owner)
     payouts = [
@@ -122,7 +124,7 @@ def select_winner(question_id: int, answer_id: int, creator_address: str):
     
     # Mark question as RESOLVED
     question["status"] = "RESOLVED"
-    question["payouts"] = payouts
+    question["payouts"] = payouts # type: ignore
     
     # Mark answer as winner
     answer["is_winner"] = True
@@ -155,7 +157,7 @@ def get_leaderboard():
             # Find the question to get bounty amount
             question = next((q for q in db["questions"] if q["id"] == a["question_id"]), None)
             if question:
-                agent_stats[addr]["total_earned"] += question["bounty"]
+                agent_stats[addr]["total_earned"] += float(question["bounty"])
     # Sort by wins descending, then by total_earned descending
     leaderboard = sorted(agent_stats.values(), key=lambda x: (x["wins"], x["total_earned"]), reverse=True)
     return leaderboard
