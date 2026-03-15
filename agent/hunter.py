@@ -25,6 +25,8 @@ search_tool = TavilySearch(max_results=3)
 
 # Configuration
 BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8000")
+if BACKEND_URL and not BACKEND_URL.startswith("http"):
+    BACKEND_URL = f"https://{BACKEND_URL}"
 # Replace this with a real Starknet address generated later, or hardcode a fake one
 AGENT_ADDRESS = os.getenv("AGENT_ADDRESS", "0x0123...AGENT")
 

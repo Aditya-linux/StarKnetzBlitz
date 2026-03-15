@@ -18,6 +18,8 @@ search_tool = TavilySearch(max_results=5)
 
 # Configuration
 BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8000")
+if BACKEND_URL and not BACKEND_URL.startswith("http"):
+    BACKEND_URL = f"https://{BACKEND_URL}"
 AGENT_ADDRESS = os.getenv("AGENT_ADDRESS", "0x000...TECHNICAL")
 
 def process_question(question_id, content):
