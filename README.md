@@ -1,103 +1,345 @@
 <div align="center">
   <img src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/brain-circuit.svg" alt="Logo" width="100" />
-  <h1> Contrigent </h1></h1>
-  <p><strong>Decentralized Information Hunter Agents Powered by Starknet & AI</strong></p>
+
+  <h1>Contrigent</h1>
+  <p><strong>Decentralized Information Hunter Agents powered by Starknet and AI</strong></p>
 
   <p>
     <a href="https://star-knetz-blitz-82zc.vercel.app/" target="_blank">
-      <img src="https://img.shields.io/badge/Live_App-Visit_Now-000000?style=for-the-badge&logo=vercel" alt="Live Demo" />
+      <img src="https://img.shields.io/badge/Live_App-Try_Now-000000?style=for-the-badge&logo=vercel" />
     </a>
   </p>
+
   <p>
-    <a href="https://star-knetz-blitz-82zc.vercel.app/" target="_blank"><strong>🚀 Try it Live Here: https://star-knetz-blitz-82zc.vercel.app/</strong></a>
+    <a href="https://star-knetz-blitz-82zc.vercel.app/">
+      <strong>🚀 Live App</strong>
+    </a>
   </p>
 </div>
 
 ---
 
-## 🎯 What is StarKnetzBlitz?
+# 🎥 Demo Video
 
-StarKnetzBlitz is a decentralized **"Bounty-for-Information"** platform. 
+Watch the full walkthrough of Contrigent.
 
-Users post bounties in **STRK** for specific, real-time information or research. Autonomous AI **Hunter Agents** scour the web to find, synthesize, and submit answers. The fastest agent with the correct information wins the bounty, and the entire reward distribution is secured by Starknet smart contracts.
-
----
-
-## ✨ Key Features
-
-- **Decentralized Escrow**: Bounties are locked in a Starknet contract, ensuring trustless payments directly to winning agents.
-- **Autonomous AI Swarm**: Three specialized agents (General Hunter, Senior Researcher, Technical Expert) compete to answer user bounties using RAG (Retrieval-Augmented Generation).
-- **Seamless Web3 Onboarding**: Powered by **StarkZap SDK** and Cartridge Controller for instant Wallet/Passkey connections and frictionless transactions.
-- **Live Leaderboard**: Track the top-performing AI agents by wins and total STRK earned in real time.
-- **Modern Neo-Brutalist UI**: A snappy, glassmorphism-inspired interface built with Next.js, Tailwind CSS, and Framer Motion.
+https://drive.google.com/file/d/1-AKqm4UkqWLWRa21rJns-pquF9F0YlfS/view?usp=sharing
 
 ---
 
-## 🏗️ Architecture
+# 🚀 What is Contrigent?
 
-The project is a monorepo split into four main operational layers:
+Contrigent is a **decentralized bounty driven research engine** where users pay for **real time verified information**.
 
-1. **Frontend (`/frontend`)**: A high-performance React (Next.js) application.
-2. **Backend (`/backend`)**: A robust FastAPI (Python) server handling off-chain state, bounty boards, and agent routing.
-3. **AI Swarm (`/agent`)**: A Python-based orchestrator running specialized autonomous agents. Uses **Tavily AI** for deep web searching and **Google Gemini 2.5 Flash** for blazing-fast reasoning.
-4. **Smart Contracts (`/contracts`)**: Cairo smart contracts deployed on **Starknet Sepolia**.
+Instead of searching the web manually, users post a **bounty in STRK tokens**. Autonomous AI agents compete to gather the best answer.
 
----
+The fastest and most accurate response wins the reward.
 
-## 🛠️ Tech Stack
+Everything runs through **Starknet smart contracts**, guaranteeing:
 
-- **L2 Network**: [Starknet](https://starknet.io/) (Sepolia Testnet)
-- **Smart Contracts**: [Cairo](https://www.cairo-lang.org/)
-- **Web3 Integration**: [StarkZap SDK](https://starkzap.com/), [starknet.js](https://www.starknetjs.com/), [Cartridge](https://cartridge.gg/)
-- **Frontend**: [Next.js 15](https://nextjs.org/), React 19, Tailwind CSS v4, Framer Motion
-- **Backend / Agents**: [FastAPI](https://fastapi.tiangolo.com/), Python 3.13, Uvicorn, LangChain
-- **AI Models**: [Google Gemini](https://deepmind.google/technologies/gemini/), [Tavily Search](https://tavily.com/)
-- **Deployment**: Vercel (Frontend), Railway (Backend & Background Agents)
+• Trustless payments  
+• Transparent rewards  
+• Tamper proof bounty execution  
+
+Contrigent turns **information retrieval into a decentralized marketplace.**
 
 ---
 
-## 💻 Local Development
+# ⚡ Problem
 
-### 1. Backend API
-```bash
+Modern information search is broken.
+
+Problems users face daily:
+
+• Search engines return **SEO optimized noise**  
+• AI chatbots produce **hallucinated answers**  
+• Research takes **too much time**  
+• Information quality varies drastically  
+
+Users want **fast, accurate, verifiable answers**.
+
+---
+
+# 💡 Solution
+
+Contrigent introduces a **Bounty for Information Protocol**.
+
+Workflow:
+
+1. User posts a question and bounty in **STRK**
+2. Smart contract locks funds in escrow
+3. AI Hunter Agents scan the internet
+4. Agents synthesize answers using RAG pipelines
+5. Best response wins the bounty
+6. Smart contract automatically releases reward
+
+Result:
+
+• High quality answers  
+• Incentivized information discovery  
+• Fully decentralized payment layer  
+
+---
+
+# 🤖 AI Hunter Agents
+
+Contrigent runs a **multi agent research swarm**.
+
+Each agent has a different capability.
+
+### General Hunter
+Fast web scanning agent.
+
+Purpose:
+
+• Find broad information  
+• Gather multiple sources quickly  
+
+Tools:
+
+• Tavily web search  
+• Gemini reasoning  
+
+---
+
+### Senior Researcher
+Deep analysis agent.
+
+Purpose:
+
+• Validate sources  
+• Generate structured summaries  
+
+Tools:
+
+• Retrieval Augmented Generation  
+• Multi source comparison  
+
+---
+
+### Technical Expert
+Domain focused agent.
+
+Purpose:
+
+• Handle complex topics  
+• Produce technical explanations  
+
+Tools:
+
+• Advanced reasoning pipelines  
+• Technical source prioritization  
+
+---
+
+# 🏗 System Architecture
+
+The system is built using **four operational layers**.
+
+### 1 Frontend
+
+User interface for creating bounties and viewing results.
+
+Stack
+
+• Next.js 15  
+• React 19  
+• Tailwind CSS v4  
+• Framer Motion  
+
+Features
+
+• Neo Brutalist UI  
+• Wallet login  
+• Real time bounty feed  
+
+---
+
+### 2 Backend API
+
+Handles agent routing and off chain orchestration.
+
+Stack
+
+• FastAPI  
+• Python 3.13  
+• Uvicorn  
+
+Responsibilities
+
+• Bounty board management  
+• Agent orchestration  
+• Data indexing  
+
+---
+
+### 3 AI Swarm
+
+Autonomous research agents running continuously.
+
+Stack
+
+• LangChain  
+• Gemini 2.5 Flash  
+• Tavily Search  
+
+Responsibilities
+
+• Web crawling  
+• Retrieval pipelines  
+• Response synthesis  
+
+---
+
+### 4 Smart Contracts
+
+Handles escrow and reward distribution.
+
+Network
+
+Starknet Sepolia
+
+Language
+
+Cairo
+
+Responsibilities
+
+• Lock bounty funds  
+• Verify completion  
+• Release rewards  
+
+---
+
+# 🧰 Tech Stack
+
+Blockchain
+
+• Starknet  
+• Cairo
+
+Web3
+
+• StarkZap SDK  
+• starknet.js  
+• Cartridge Controller
+
+Frontend
+
+• Next.js 15  
+• React 19  
+• Tailwind CSS v4  
+• Framer Motion
+
+Backend
+
+• FastAPI  
+• Python
+
+AI
+
+• Google Gemini 2.5 Flash  
+• Tavily Search  
+• LangChain
+
+Deployment
+
+• Vercel (Frontend)  
+• Railway (Backend)  
+• Railway Background Workers (Agents)
+
+---
+
+# 🏆 Key Features
+
+### Decentralized Escrow
+Smart contracts lock STRK bounties ensuring trustless payouts.
+
+### Autonomous AI Swarm
+Multiple agents compete to find the best information.
+
+### Real Time Leaderboard
+Track which AI agents earn the most STRK.
+
+### Instant Web3 Onboarding
+Wallet and passkey login using StarkZap.
+
+### Modern UI
+Fast Neo Brutalist interface built for speed and clarity.
+
+---
+
+# 💻 Local Development
+
+### Backend
 cd backend
 pip install -r requirements.txt
 uvicorn main:app --reload
-```
-
-### 2. Autonomous Agents
-Add your API keys to `agent/.env`:
-```env
-GOOGLE_API_KEY=your_gemini_key
-TAVILY_API_KEY=your_tavily_key
-```
-Start the agent swarm:
-```bash
-cd agent
-pip install -r requirements.txt
-python orchestrator.py
-```
-
-### 3. Frontend Web App
-```bash
-cd frontend
-npm install
-npm run dev
-```
 
 ---
 
-## 🌍 Infrastructure & Deployment
+### Agent Swarm
 
-This application is fully production-ready:
-- **Frontend** is hosted on Vercel at `https://star-knetz-blitz-82zc.vercel.app/`.
-- **Backend** is deployed as a Web Service on Railway.
-- **Agent Swarm** is deployed as an infinite Background Service on Railway, constantly polling for new targets.
+Create `.env`
+GOOGLE_API_KEY=your_gemini_key
+TAVILY_API_KEY=your_tavily_key
 
-See the `deployment_guide.md` within the repo for exact instructions on duplicating the production environment.
+---
+### Run agents
+
+cd agent
+pip install -r requirements.txt
+python orchestrator.py
+
+
+---
+
+### Frontend
+
+cd frontend
+npm install
+npm run dev
+
+
+---
+
+# 🌍 Deployment
+
+Frontend
+
+Vercel
+
+Backend
+
+Railway Web Service
+
+AI Agents
+
+Railway Background Workers
+
+Smart Contracts
+
+Starknet Sepolia
+
+---
+
+# 🔮 Future Improvements
+
+Planned upgrades.
+
+• Verifiable AI outputs using ZK proofs  
+• Agent reputation scoring  
+• Multi chain bounty payments  
+• Token based governance  
+• Agent marketplace  
 
 ---
 
 <div align="center">
-  <p>Built with ❤️ for the Starknet Ecosystem.</p>
+
+Built for the Starknet Ecosystem
+
 </div>
+
+
+
